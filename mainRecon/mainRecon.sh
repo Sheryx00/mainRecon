@@ -56,7 +56,7 @@ get_subdomains() {
         else
             mv all_domains.txt domains.txt
         fi
-        find . -type f -name '_domains.txt' -delete
+        find . -type f -name '*_domains.txt' -delete
     fi
 }
 
