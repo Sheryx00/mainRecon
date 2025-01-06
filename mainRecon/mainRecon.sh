@@ -99,7 +99,7 @@ get_waybackurl() {
 get_aquatone() {
     echo -e $red"[+]"$end $bold"Get Aquatone"$end
     current_path=$(pwd)
-    cat alive.txt | /usr/bin/aquatone -silent --ports xlarge -out $current_path/aquatone/ -scan-timeout 40000
+    cat alive.txt | /usr/bin/aquatone -silent --ports xlarge -out $current_path/aquatone/ -scan-timeout 40000 2>/dev/null
 }
 
 get_js() {
@@ -133,21 +133,20 @@ get_endpoints() {
 }
 
 get_params() {
-    mkdir params
-    mkdir params/gospider
+    mkdir -p params/gospider
 
-    echo -e $red"[+]"$end $bold"Running Paramspider"$end
-    for targets in $(cat alive.txt); do
-        # Remove the protocol and sanitize the URL for a valid filename
-        targets_file=$(echo $targets | sed -E 's|https?://||; s|[/:]+|_|g')
-        
-        # Run ParamSpider with the sanitized domain
-        domain=$(echo $targets | sed -E 's|https?://||')
-        paramspider --domain "$domain" >/dev/null 2>&1
+    echo -e $red"[+]"$end $bold"Normalizing and deduplicating domains"$end
+    # Normalize and deduplicate domains
+    unique_domains=$(cat alive.txt | sed -E 's|https?://||' | sort -u)
+
+    for domain in $unique_domains; do
+        echo -e $red"[+]"$end $bold"Running Paramspider: $domain"$end
+        paramspider --domain "$domain" > /dev/null 2>&1
     done
     mv results params/paramspider
+
     echo -e $red"[+]"$end $bold"Running Gospider"$end
-    gospider -S alive.txt -o params/gospider
+    gospider -S alive.txt -o params/gospider > /dev/null 2>&1
 }
 
 get_paths() {
