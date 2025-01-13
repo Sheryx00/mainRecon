@@ -12,10 +12,10 @@ echo -e $yellow"
  ._ _   _. o ._  |_)  _   _  _  ._  
  | | | (_| | | | | \ (/_ (_ (_) | |
 
-By_l34r00t | {v1.0}
 @leapintos | leandro@leandropintos.com
 -----------|--------------------------
-@Sheryx00  | {v1.1}
+By_l34r00t | {v1.0}
+Sheryx00   | {v1.1}
 
 "$end
 
@@ -43,12 +43,15 @@ get_subdomains() {
         cp /mainData/$file domains.txt
     else
         echo -e $red"[+]"$end $bold"Get Subdomains"$end
+        echo -e $green"[+]"$end $bold"Running findomain"$end
         findomain -q -f /mainData/$file -r -u findomain_domains.txt
+        echo -e $green"[+]"$end $bold"Running amass"$end
         amass enum -df /mainData/$file -active -o ammas_active_domains.txt
         cat /mainData/$file | assetfinder --subs-only >>assetfinder_domains.txt
+        echo -e $green"[+]"$end $bold"Running subfinder"$end
         subfinder -dL /mainData/$file -o subfinder_domains.txt
         sort -u *_domains.txt -o subdomains.txt
-        cat subdomains.txt | rev | cut -d . -f 1-3 | rev | sort -u | tee root_subdomains.txt
+        cat subdomains.txt | rev | cut -d . -f 1-3 | rev | sort -u | tee root_sub_domains.txt
         cat *.txt | sort -u > all_domains.txt
         if [ ! -z $exclude ];then
             echo -e $red"[+]"$end $bold"Excluding blacklisted domains"$end
@@ -62,7 +65,6 @@ get_subdomains() {
 
 get_alive() {
     echo -e $red"[+]"$end $bold"Get Alive"$end
-
     cat domains.txt | httprobe -c 50 -t 3000 >alive.txt
     cat alive.txt | python -c "import sys; import json; print (json.dumps({'domains':list(sys.stdin)}))" >alive.json
 }
@@ -140,12 +142,12 @@ get_params() {
     unique_domains=$(cat alive.txt | sed -E 's|https?://||' | sort -u)
 
     for domain in $unique_domains; do
-        echo -e $red"[+]"$end $bold"Running Paramspider: $domain"$end
+        echo -e $green"[+]"$end $bold"Running Paramspider: $domain"$end
         paramspider --domain "$domain" > /dev/null 2>&1
     done
     mv results params/paramspider
 
-    echo -e $red"[+]"$end $bold"Running Gospider"$end
+    echo -e $green"[+]"$end $bold"Running Gospider"$end
     gospider -S alive.txt -o params/gospider > /dev/null 2>&1
 }
 
