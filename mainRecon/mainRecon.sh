@@ -101,7 +101,7 @@ get_waybackurl() {
 get_aquatone() {
     echo -e $red"[+]"$end $bold"Get Aquatone"$end
     current_path=$(pwd)
-    cat alive.txt | /usr/bin/aquatone -silent --ports xlarge -out $current_path/aquatone/ -scan-timeout 40000 2>/dev/null
+    cat alive.txt | /usr/bin/aquatone -silent --ports xlarge -out $current_path/aquatone/ -http-timeout 60000 -threads 1 2>/dev/null
 }
 
 get_js() {
